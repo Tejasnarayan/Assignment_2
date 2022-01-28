@@ -15,17 +15,17 @@ df1.info(verbose=True)
 with urllib.request.urlopen("https://jsonplaceholder.typicode.com/posts") as url:
     data = json.loads(url.read().decode())
     df2 = pd.DataFrame(data)
-df2.info(verbose=True)
+#df2.info(verbose=True)
 
 with urllib.request.urlopen("https://jsonplaceholder.typicode.com/comments") as url:
     data = json.loads(url.read().decode())
     df3 = pd.DataFrame(data)
-df3.info(verbose=True)
+#df3.info(verbose=True)
 
 with urllib.request.urlopen("https://jsonplaceholder.typicode.com/todos") as url:
     data = json.loads(url.read().decode())
     df4 = pd.DataFrame(data)
-df4.info(verbose=True)
+#df4.info(verbose=True)
 
 #df1.to_csv('users.csv', encoding='utf-8', index=False)
 #df2.to_csv('posts.csv', encoding='utf-8', index=False)
@@ -39,6 +39,7 @@ conn = psycopg2.connect(database="demodb",user='postgres', password='123',
 conn.autocommit = True
 cursor = conn.cursor()
 
+"""
 sql1_1 = '''CREATE TABLE USERS(id int NOT NULL, name varchar(50), username varchar(50),\
 email varchar(100), phone varchar(100), website varchar(50), street varchar(100), suite varchar(100),\
 	city varchar(100), zipcode varchar(10), latitude varchar(20), longitude varchar(20), compname varchar(100),\
@@ -96,5 +97,18 @@ cursor.execute(sql3_4)
 for i in cursor.fetchall():
 	print(i)
 
+sql4_1 = ''' SELECT id, title, comment_count
+    FROM ( SELECT p.id, p.title, COUNT(c.id) AS comment_count
+             FROM posts p
+                 ,comments c
+             WHERE c.postId = p.id
+             GROUP BY p.id, p.title
+             ORDER BY 3 DESC ) x
+    LIMIT 1;'''
+
+cursor.execute(sql4_1)	
+"""
+
 conn.commit()
 conn.close()
+
