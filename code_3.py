@@ -101,3 +101,13 @@ for i in cursor.fetchall():
 conn.commit()
 conn.close()
 
+"""
+SQL query to find which user made the longest post.
+SELECT id,name,username FROM users WHERE id=(SELECT userid FROM posts ORDER BY Length(body) DESC LIMIT 1)
+
+SQL query to find the post with most commnets.
+SELECT id,title FROM posts WHERE ID ::int4=(SELECT postid FROM comments GROUP BY postid ORDER BY Count(*) DESC LIMIT 1)
+									 
+SQL query to find the least number of items pending in todo.
+SELECT id,name FROM users WHERE id=(SELECT userid FROM todos WHERE todos.completed != 'true' GROUP BY userid ORDER BY COUNT(*) ASC LIMIT 1)
+"""
