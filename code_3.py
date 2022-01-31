@@ -4,9 +4,9 @@ import requests
 from pandas.io.json import json_normalize
 import psycopg2
 
-url = "https://jsonplaceholder.typicode.com/users"
+url = "https://jsonplaceholder.typicode.com/users" 
 resp = requests.get(url=url)
-df1 = json_normalize(resp.json())
+df1 = json_normalize(resp.json()) #flattening a json file
 df1.rename(columns = {'address.street':'street','address.suite':'suite','address.city':'city',\
 	'address.zipcode':'zipcode','address.geo.lat':'latitude','address.geo.lng':'longitude',\
 	'company.name':'compname','company.catchPhrase':'compcatchPhrase','company.bs':'compbs'}, inplace=True)
@@ -27,19 +27,20 @@ with urllib.request.urlopen("https://jsonplaceholder.typicode.com/todos") as url
     df4 = pd.DataFrame(data)
 #df4.info(verbose=True)
 
-#df1.to_csv('users.csv', encoding='utf-8', index=False)
-#df2.to_csv('posts.csv', encoding='utf-8', index=False)
-#df3.to_csv('comments.csv', encoding='utf-8', index=False)
-#df4.to_csv('todos.csv', encoding='utf-8', index=False)
+#converting json file into csv file
+df1.to_csv('users.csv', encoding='utf-8', index=False)
+df2.to_csv('posts.csv', encoding='utf-8', index=False)
+df3.to_csv('comments.csv', encoding='utf-8', index=False)
+df4.to_csv('todos.csv', encoding='utf-8', index=False)
 
-
+#database credentials
 conn = psycopg2.connect(database="demodb",user='postgres', password='123',
 						host='localhost', port='5432')
 
 conn.autocommit = True
 cursor = conn.cursor()
 
-"""
+#SQl query to create tables in db
 sql1_1 = '''CREATE TABLE USERS(id int NOT NULL, name varchar(50), username varchar(50),\
 email varchar(100), phone varchar(100), website varchar(50), street varchar(100), suite varchar(100),\
 	city varchar(100), zipcode varchar(10), latitude varchar(20), longitude varchar(20), compname varchar(100),\
@@ -58,7 +59,7 @@ sql1_4 = '''CREATE TABLE TODOS(userId int NOT NULL, id varchar(20),\
 	title varchar(200), completed varchar(10));'''
 cursor.execute(sql1_4)
 
-
+#copying data to the tables from csv files
 sql2_1 = '''COPY users(id, name, username, email, phone, website, street, suite, city, zipcode, latitude, longitude, compname, compcatchPhrase, compbs)
 FROM 'E:/Projects/Assignment_2/users.csv'
 DELIMITER ','
@@ -83,7 +84,7 @@ DELIMITER ','
 CSV HEADER;'''
 cursor.execute(sql2_4)
 
-
+#displaying
 sql3_1 = '''select * from users;'''
 sql3_2 = '''select * from posts;'''
 sql3_3 = '''select * from comments;'''
@@ -96,19 +97,7 @@ cursor.execute(sql3_4)
 
 for i in cursor.fetchall():
 	print(i)
-
-sql4_1 = ''' SELECT id, title, comment_count
-    FROM ( SELECT p.id, p.title, COUNT(c.id) AS comment_count
-             FROM posts p
-                 ,comments c
-             WHERE c.postId = p.id
-             GROUP BY p.id, p.title
-             ORDER BY 3 DESC ) x
-    LIMIT 1;'''
-
-cursor.execute(sql4_1)	
-"""
-
+	
 conn.commit()
 conn.close()
 
